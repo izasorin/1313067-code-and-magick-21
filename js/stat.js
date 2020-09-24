@@ -1,4 +1,3 @@
-
 'use strict';
 
 const CLOUD_WIDTH = 420;
