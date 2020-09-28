@@ -1,30 +1,45 @@
 'use strict';
-
-const CLOUD_WIDTH = 420;
-const CLOUD_HEIGHT = 270;
-const CLOUD_X = 100;
-const CLOUD_Y = 10;
 const GAP = 10;
-const CLOUD_COLOR = `#ffffff`;
-const CLOUD_SHADOW_COLOR = `rgba(0, 0, 0, 0.7)`;
-const BAR_WIDTH = 40;
-const BAR_MAX_HEIGHT = -150;
-const BAR_GAP = 50;
-const PLAYER_BAR_COLOR = `rgba(255, 0, 0, 1)`;
 const PLAYER_NAME = `Вы`;
-const FONT = `16px PT Mono`;
-const TEXT_COLOR = `#000000`;
-const TEXT_HEIGHT = 10;
+
+const CLOUD = {
+  WIDTH: 420,
+  HEIGHT: 270,
+  X: 100,
+  Y: 10
+};
+
+const COLOR = {
+  CLOUD: `#ffffff`,
+  TEXT: `#000000`,
+  CLOUD_SHADOW: `rgba(0, 0, 0, 0.7)`,
+  PLAYER_BAR: `rgba(255, 0, 0, 1)`
+};
+
+const TEXT = {
+  FONT: `16px PT Mono`,
+  HEIGHT: 10,
+  BASELINE: `hanging`,
+  CAPTION: `Ура вы победили!`,
+  CONTENT: `Список результатов:`
+};
+
+const BAR = {
+  WIDTH: 40,
+  MAX_HEIGHT: -150,
+  GAP: 50,
+};
+
 
 const renderCloud = (ctx, x, y, color) => {
   ctx.fillStyle = color;
-  ctx.fillRect(x, y, CLOUD_WIDTH, CLOUD_HEIGHT);
+  ctx.fillRect(x, y, CLOUD.WIDTH, CLOUD.HEIGHT);
 };
 
 const renderMessage = (ctx, x, y, text) => {
-  ctx.fillStyle = TEXT_COLOR;
-  ctx.font = FONT;
-  ctx.textBaseline = `hanging`;
+  ctx.fillStyle = COLOR.TEXT;
+  ctx.font = TEXT.FONT;
+  ctx.textBaseline = TEXT.BASELINE;
   ctx.fillText(text, x, y);
 };
 
@@ -40,30 +55,35 @@ const getMaxElement = (arr) => {
   return maxElement;
 };
 
-const getRandomNumber = () => Math.floor(Math.random() * 90);
+const getRandomNumber = (min = 0, max = 90) => Math.floor(min + Math.random() * (max - min));
+
+const getRandomColor = () => `hsl(250, ` + getRandomNumber() + `%, 50%)`;
+
+const getStatisticCoordsX = (i) => CLOUD.X + BAR.GAP - GAP + (BAR.WIDTH + BAR.GAP) * i;
+
+const getPlayerBarColor = (players) => {
+  return (players === PLAYER_NAME) ? COLOR.PLAYER_BAR : getRandomColor();
+};
 
 window.renderStatistics = (ctx, players, times) => {
-  renderCloud(ctx, CLOUD_X + GAP, CLOUD_Y + GAP, CLOUD_SHADOW_COLOR);
-  renderCloud(ctx, CLOUD_X, CLOUD_Y, CLOUD_COLOR);
-  renderMessage(ctx, CLOUD_X + GAP * 2, CLOUD_Y + GAP * 2, `Ура вы победили!`);
-  renderMessage(ctx, CLOUD_X + GAP * 2, CLOUD_Y + GAP * 2 + GAP * 2, `Список результатов:`);
+  renderCloud(ctx, CLOUD.X + GAP, CLOUD.Y + GAP, COLOR.CLOUD_SHADOW);
+  renderCloud(ctx, CLOUD.X, CLOUD.Y, COLOR.CLOUD);
+  renderMessage(ctx, CLOUD.X + GAP * 2, CLOUD.Y + GAP * 2, TEXT.CAPTION);
+  renderMessage(ctx, CLOUD.X + GAP * 2, CLOUD.Y + GAP * 2 + GAP * 2, TEXT.CONTENT);
 
   const maxTime = getMaxElement(times);
 
   for (let i = 0; i < players.length; i++) {
-    let barHeight = times[i] * BAR_MAX_HEIGHT / maxTime;
+    let barHeight = times[i] * BAR.MAX_HEIGHT / maxTime;
 
-    ctx.fillStyle = TEXT_COLOR;
-    ctx.font = FONT;
-    ctx.textBaseline = `hanging`;
-    ctx.fillText(players[i], CLOUD_X + BAR_GAP - GAP + (BAR_WIDTH + BAR_GAP) * i, CLOUD_HEIGHT - GAP * 2);
-    ctx.fillText(Math.ceil(times[i]), CLOUD_X + BAR_GAP - GAP + (BAR_WIDTH + BAR_GAP) * i, CLOUD_HEIGHT - BAR_GAP - Math.abs(barHeight));
+    ctx.fillStyle = COLOR.TEXT;
+    ctx.font = TEXT.FONT;
+    ctx.textBaseline = TEXT.BASELINE;
+    ctx.fillText(players[i], getStatisticCoordsX(i), CLOUD.HEIGHT - GAP * 2);
+    ctx.fillText(Math.ceil(times[i]), getStatisticCoordsX(i), CLOUD.HEIGHT - BAR.GAP - Math.abs(barHeight));
 
-    if (players[i] === PLAYER_NAME) {
-      ctx.fillStyle = PLAYER_BAR_COLOR;
-    } else {
-      ctx.fillStyle = `hsl(250, ` + getRandomNumber() + `%, 50%)`;
-    }
-    ctx.fillRect(CLOUD_X + BAR_GAP - GAP + (BAR_WIDTH + BAR_GAP) * i, CLOUD_HEIGHT - GAP * 2 - TEXT_HEIGHT, BAR_WIDTH, barHeight);
+    ctx.fillStyle = getPlayerBarColor(players[i]);
+
+    ctx.fillRect(getStatisticCoordsX(i), CLOUD.HEIGHT - GAP * 2 - TEXT.HEIGHT, BAR.WIDTH, barHeight);
   }
 };
