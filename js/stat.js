@@ -1,4 +1,5 @@
 'use strict';
+
 const GAP = 10;
 const PLAYER_NAME = `Вы`;
 
