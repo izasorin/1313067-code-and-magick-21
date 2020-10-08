@@ -70,13 +70,11 @@ const renderWizard = (wizard) => {
 const renderWizards = (wizards) => {
   const fragment = document.createDocumentFragment();
   wizards.map(renderWizard).forEach((wizard) => fragment.appendChild(wizard));
-  similarListElement.appendChild(fragment);
+  return fragment;
 };
 
-renderWizards(generateWizards(WIZARDS_QUANTITY));
-
-userDialog.classList.remove(`hidden`);
+const wizards = generateWizards(WIZARDS_QUANTITY);
+similarListElement.appendChild(renderWizards(wizards));
 
 userDialog.querySelector(`.setup-similar`).classList.remove(`hidden`);
-
-document.querySelector(`.setup-similar`).classList.remove(`hidden`);
+userDialog.classList.remove(`hidden`);
